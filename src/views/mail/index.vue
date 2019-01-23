@@ -51,6 +51,7 @@ import Tinymce from '@/components/Tinymce'
 import MDinput from '@/components/MDinput'
 import Sticky from '@/components/Sticky' // 粘性header组件
 import { fetchArticle } from '@/api/article'
+import axios from 'axios'
 
 const defaultForm = {
   status: 'draft',
@@ -136,11 +137,29 @@ export default {
       this.$refs.postForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$notify({
-            title: '成功',
-            message: '发布文章成功',
-            type: 'success',
-            duration: 2000
+          // this.$notify({
+          //   title: '成功',
+          //   message: '发布文章成功',
+          //   type: 'success',
+          //   duration: 2000
+          // })
+          axios.post(
+            'http://127.0.0.1:22222/mail',
+            this.postForm
+          ).then((res) => {
+            this.$notify({
+              title: '成功',
+              message: '发送邮件成功:' + res,
+              type: 'success',
+              duration: 4000
+            })
+          }).catch((error) => {
+            this.$notify({
+              title: '失败',
+              message: '发送邮件成功失败:' + error,
+              type: 'fail',
+              duration: 4000
+            })
           })
           this.postForm.status = 'published'
           this.loading = false
