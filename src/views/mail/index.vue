@@ -3,9 +3,6 @@
     <el-form ref="postForm" :model="postForm" :rules="rules" class="form-container">
 
       <sticky :class-name="'sub-navbar '+postForm.status">
-        <CommentDropdown v-model="postForm.comment_disabled" />
-        <PlatformDropdown v-model="postForm.platforms" />
-        <SourceUrlDropdown v-model="postForm.source_uri" />
         <el-button v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm">{{ $t('mail.send') }}
         </el-button>
       </sticky>
@@ -62,9 +59,6 @@ const defaultForm = {
   sender: '',
   content: '', // 文章内容
   content_short: '', // 文章摘要
-  source_uri: '', // 文章外链
-  display_time: undefined, // 前台展示时间
-  id: undefined,
   platforms: ['a-platform'],
   comment_disabled: false,
   importance: 0
@@ -106,7 +100,7 @@ export default {
   },
   computed: {
     contentShortLength() {
-      return this.postForm.content_short.length
+      return this.postForm.content.length
     },
     lang() {
       return this.$store.getters.language
@@ -137,7 +131,7 @@ export default {
       })
     },
     submitForm() {
-      this.postForm.display_time = parseInt(this.display_time / 1000)
+      // this.postForm.display_time = parseInt(this.display_time / 1000)
       console.log(this.postForm)
       this.$refs.postForm.validate(valid => {
         if (valid) {
@@ -155,22 +149,6 @@ export default {
           return false
         }
       })
-    },
-    draftForm() {
-      if (this.postForm.content.length === 0 || this.postForm.title.length === 0) {
-        this.$message({
-          message: '请填写必要的标题和内容',
-          type: 'warning'
-        })
-        return
-      }
-      this.$message({
-        message: '保存成功',
-        type: 'success',
-        showClose: true,
-        duration: 1000
-      })
-      this.postForm.status = 'draft'
     }
   }
 }
