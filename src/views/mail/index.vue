@@ -59,7 +59,6 @@ const defaultForm = {
   addresseeId: '',
   sender: '',
   content: '', // 文章内容
-  content_short: '', // 文章摘要
   platforms: ['a-platform'],
   comment_disabled: false,
   importance: 0
