@@ -77,6 +77,19 @@ export const constantRouterMap = [
     ]
   },
   {
+    path: '/mail',
+    component: Layout,
+    redirect: '/mail/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/mail/index'),
+        name: 'Mail',
+        meta: { title: 'mail', icon: 'mail', noCache: true }
+      }
+    ]
+  },
+  {
     path: '/documentation',
     component: Layout,
     redirect: '/documentation/index',

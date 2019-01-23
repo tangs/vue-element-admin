@@ -62,7 +62,8 @@ export default {
     theme: 'Theme',
     clipboardDemo: 'Clipboard',
     i18n: 'I18n',
-    externalLink: 'External Link'
+    externalLink: 'External Link',
+    mail: 'Mail'
   },
   navbar: {
     logOut: 'Log Out',
@@ -80,6 +81,13 @@ export default {
     any: 'any',
     thirdparty: 'Or connect with',
     thirdpartyTips: 'Can not be simulated on local, so please combine you own business simulation! ! !'
+  },
+  mail: {
+    addresseeId: 'addrID',
+    sender: 'sender',
+    title: 'Title',
+    content: 'content',
+    send: 'send'
   },
   documentation: {
     documentation: 'Documentation',

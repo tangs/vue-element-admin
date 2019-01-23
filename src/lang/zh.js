@@ -62,7 +62,8 @@ export default {
     theme: '换肤',
     clipboardDemo: 'Clipboard',
     i18n: '国际化',
-    externalLink: '外链'
+    externalLink: '外链',
+    mail: '邮件'
   },
   navbar: {
     logOut: '退出登录',
@@ -80,6 +81,13 @@ export default {
     any: '随便填',
     thirdparty: '第三方登录',
     thirdpartyTips: '本地不能模拟，请结合自己业务进行模拟！！！'
+  },
+  mail: {
+    addresseeId: '收件人ID',
+    sender: '发送者',
+    title: '标题',
+    content: '内容',
+    send: '发送'
   },
   documentation: {
     documentation: '文档',
