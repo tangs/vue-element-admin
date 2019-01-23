@@ -16,13 +16,13 @@
             <div class="postInfo-container">
               <el-row>
                 <el-col :span="8">
-                  <el-form-item :label="$t('mail.addresseeId')" label-width="60px" class="postInfo-container-item">
+                  <el-form-item :label="$t('mail.addresseeId')" label-width="60px" class="article-textarea" prop="addresseeId">
                     <el-input :rows="1" v-model="postForm.addresseeId" placeholder="请输入内容"/>
                   </el-form-item>
                 </el-col>
                 <el-col :span="8">
-                  <el-form-item :label="$t('mail.sender')" label-width="60px" class="postInfo-container-item">
-                    <el-input :rows="1" v-model="postForm.addresseeId" placeholder="请输入内容"/>
+                  <el-form-item :label="$t('mail.sender')" label-width="60px" class="article-textarea" prop="sender">
+                    <el-input :rows="1" v-model="postForm.sender" placeholder="请输入内容"/>
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -34,7 +34,13 @@
             {{ $t('mail.title') }}
           </MDinput>
         </el-form-item>
-        <el-form-item :label="$t('mail.content')" style="margin-bottom: 40px;" label-width="60px">
+        <!-- <el-form-item :label="$t('mail.addresseeId')" style="margin-bottom: 40px;" label-width="60px" prop="addresseeId">
+          <el-input :rows="1" v-model="postForm.addresseeId" type="textarea" class="article-textarea" autosize placeholder="请输入内容"/>
+        </el-form-item>
+        <el-form-item :label="$t('mail.sender')" style="margin-bottom: 40px;" label-width="60px" prop="sender">
+          <el-input :rows="1" v-model="postForm.sender" type="textarea" class="article-textarea" autosize placeholder="请输入内容"/>
+        </el-form-item> -->
+        <el-form-item :label="$t('mail.content')" style="margin-bottom: 40px;" label-width="60px" prop="content">
           <el-input :rows="1" v-model="postForm.content" type="textarea" class="article-textarea" autosize placeholder="请输入内容"/>
           <span v-show="contentShortLength" class="word-counter">{{ contentShortLength }}字</span>
         </el-form-item>
@@ -47,17 +53,16 @@
 import Tinymce from '@/components/Tinymce'
 import MDinput from '@/components/MDinput'
 import Sticky from '@/components/Sticky' // 粘性header组件
-import { validateURL } from '@/utils/validate'
 import { fetchArticle } from '@/api/article'
-import { userSearch } from '@/api/remoteSearch'
 
 const defaultForm = {
   status: 'draft',
   title: '', // 文章题目
+  addresseeId: '',
+  sender: '',
   content: '', // 文章内容
   content_short: '', // 文章摘要
   source_uri: '', // 文章外链
-  image_uri: '', // 文章图片
   display_time: undefined, // 前台展示时间
   id: undefined,
   platforms: ['a-platform'],
@@ -86,30 +91,15 @@ export default {
         callback()
       }
     }
-    const validateSourceUri = (rule, value, callback) => {
-      if (value) {
-        if (validateURL(value)) {
-          callback()
-        } else {
-          this.$message({
-            message: '外链url填写不正确',
-            type: 'error'
-          })
-          callback(new Error('外链url填写不正确'))
-        }
-      } else {
-        callback()
-      }
-    }
     return {
       postForm: Object.assign({}, defaultForm),
       loading: false,
       userListOptions: [],
       rules: {
-        image_uri: [{ validator: validateRequire }],
         title: [{ validator: validateRequire }],
         content: [{ validator: validateRequire }],
-        source_uri: [{ validator: validateSourceUri, trigger: 'blur' }]
+        addresseeId: [{ validator: validateRequire }],
+        sender: [{ validator: validateRequire }]
       },
       tempRoute: {}
     }
@@ -141,18 +131,10 @@ export default {
         this.postForm = response.data
         // Just for test
         this.postForm.title += `   Article Id:${this.postForm.id}`
-        this.postForm.content_short += `   Article Id:${this.postForm.id}`
-
-        // Set tagsview title
-        this.setTagsViewTitle()
+        this.postForm.content += `   Article Id:${this.postForm.id}`
       }).catch(err => {
         console.log(err)
       })
-    },
-    setTagsViewTitle() {
-      const title = this.lang === 'zh' ? '编辑文章' : 'Edit Article'
-      const route = Object.assign({}, this.tempRoute, { title: `${title}-${this.postForm.id}` })
-      this.$store.dispatch('updateVisitedView', route)
     },
     submitForm() {
       this.postForm.display_time = parseInt(this.display_time / 1000)
@@ -189,12 +171,6 @@ export default {
         duration: 1000
       })
       this.postForm.status = 'draft'
-    },
-    getRemoteUserList(query) {
-      userSearch(query).then(response => {
-        if (!response.data.items) return
-        this.userListOptions = response.data.items.map(v => v.name)
-      })
     }
   }
 }
