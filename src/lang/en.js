@@ -89,6 +89,9 @@ export default {
     content: 'content',
     send: 'send'
   },
+  funcMask: {
+    publish: 'publish'
+  },
   documentation: {
     documentation: 'Documentation',
     github: 'Github Repository'

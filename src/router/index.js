@@ -88,6 +88,19 @@ export const constantRouterMap = [
         meta: { title: 'mail', icon: 'mail', noCache: true }
       }
     ]
+  },
+  {
+    path: '/funcMask',
+    component: Layout,
+    redirect: '/funcMask/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/funcMask/index'),
+        name: 'FuncMask',
+        meta: { title: 'funcMask', icon: 'mask', noCache: true }
+      }
+    ]
   }
 ]
 
