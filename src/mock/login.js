@@ -22,6 +22,39 @@ export default {
     const { username } = JSON.parse(config.body)
     return userMap[username]
   },
+  // loginByUsername: config => {
+  //   return new Promise((resolve, reject) => {
+  //     const data = JSON.parse(config.body)
+  //     const params = {
+  //       username: data.username
+  //     }
+  //     params.token = md5(data.username + data.password)
+  //     console.log('req:' + config.body)
+  //     console.log('req:' + JSON.stringify(params))
+  //     const fail = (error) => {
+  //       console.log('error:' + error)
+  //       reject(error)
+  //     }
+  //     axios.get(
+  //       'http://120.132.50.206:8585/login.php',
+  //       {
+  //         params: params
+  //       }
+  //     ).then((res) => {
+  //       const resData = res.data
+  //       const str = JSON.stringify(resData)
+  //       console.log('res:' + str)
+  //       if (resData.result === 'true') {
+  //         const { username } = JSON.parse(config.body)
+  //         resolve(userMap[username])
+  //       } else {
+  //         fail(resData.param)
+  //       }
+  //     }).catch((error) => {
+  //       fail(error)
+  //     })
+  //   })
+  // },
   getUserInfo: config => {
     const { token } = param2Obj(config.url)
     if (userMap[token]) {

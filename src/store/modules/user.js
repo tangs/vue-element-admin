@@ -1,5 +1,8 @@
 import { loginByUsername, logout, getUserInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
+import md5 from 'js-md5'
+import axios from 'axios'
+import cookie from 'js-cookie'
 
 const user = {
   state: {
@@ -48,13 +51,39 @@ const user = {
     LoginByUsername({ commit }, userInfo) {
       const username = userInfo.username.trim()
       return new Promise((resolve, reject) => {
-        loginByUsername(username, userInfo.password).then(response => {
-          const data = response.data
-          commit('SET_TOKEN', data.token)
-          setToken(response.data.token)
-          resolve()
-        }).catch(error => {
+        const params = {
+          username: username
+        }
+        params.token = md5(username + userInfo.password)
+        console.log('req:' + JSON.stringify(params))
+        const fail = (error) => {
+          console.log('error:' + error)
           reject(error)
+        }
+        axios.get(
+          'http://120.132.50.206:8585/login.php',
+          {
+            params: params
+          }
+        ).then((res) => {
+          const resData = res.data
+          const str = JSON.stringify(resData)
+          console.log('res:' + str)
+          if (resData.result === 'true') {
+            loginByUsername(username, userInfo.password).then(response => {
+              const data = response.data
+              cookie.set('server_token_key', data.param)
+              commit('SET_TOKEN', data.token)
+              setToken(response.data.token)
+              resolve()
+            }).catch(error => {
+              fail(error)
+            })
+          } else {
+            fail(resData.param)
+          }
+        }).catch((error) => {
+          fail(error)
         })
       })
     },
