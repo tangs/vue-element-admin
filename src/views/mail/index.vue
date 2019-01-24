@@ -148,7 +148,7 @@ export default {
           ).then((res) => {
             this.$notify({
               title: '成功',
-              message: '发送邮件成功:' + res,
+              message: '发送邮件成功.',
               type: 'success',
               duration: 4000
             })
