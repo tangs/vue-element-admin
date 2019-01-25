@@ -3,7 +3,9 @@
     <el-form ref="postForm" :model="postForm" :rules="rules" class="form-container">
 
       <sticky :class-name="'sub-navbar '+postForm.status">
-        <el-button v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm">{{ $t('funcMask.publish') }}
+        <el-button v-loading="loading" style="margin-left: 10px;" type="success" @click="query">{{ $t('funcMask.query') }}
+        </el-button>
+        <el-button v-loading="loading" style="margin-left: 10px;" type="success" @click="publish">{{ $t('funcMask.publish') }}
         </el-button>
       </sticky>
 
@@ -12,14 +14,14 @@
           <el-col :span="24">
             <div class="postInfo-container">
               <el-row>
-                <el-col :span="8">
-                  <el-form-item :label="$t('mail.addresseeId')" label-width="60px" class="article-textarea" prop="addresseeId">
-                    <el-input :rows="1" v-model="postForm.addresseeId" placeholder="请输入内容"/>
+                <el-col :span="4">
+                  <el-form-item :label="$t('funcMask.version')" label-width="60px" class="article-textarea" prop="version">
+                    <el-input :rows="1" v-model="postForm.version" placeholder="请输入内容"/>
                   </el-form-item>
                 </el-col>
-                <el-col :span="8">
-                  <el-form-item :label="$t('mail.sender')" label-width="60px" class="article-textarea" prop="sender">
-                    <el-input :rows="1" v-model="postForm.sender" placeholder="请输入内容"/>
+                <el-col :span="15" style="margin-left: 32px;">
+                  <el-form-item :label="$t('funcMask.channels')" label-width="65px" class="article-textarea" prop="channels">
+                    <el-input :rows="1" v-model="postForm.channels" placeholder="请输入内容"/>
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -31,15 +33,8 @@
             {{ $t('mail.title') }}
           </MDinput>
         </el-form-item>
-        <!-- <el-form-item :label="$t('mail.addresseeId')" style="margin-bottom: 40px;" label-width="60px" prop="addresseeId">
-          <el-input :rows="1" v-model="postForm.addresseeId" type="textarea" class="article-textarea" autosize placeholder="请输入内容"/>
-        </el-form-item>
-        <el-form-item :label="$t('mail.sender')" style="margin-bottom: 40px;" label-width="60px" prop="sender">
-          <el-input :rows="1" v-model="postForm.sender" type="textarea" class="article-textarea" autosize placeholder="请输入内容"/>
-        </el-form-item> -->
-        <el-form-item :label="$t('mail.content')" style="margin-bottom: 40px;" label-width="60px" prop="content">
-          <el-input :rows="1" v-model="postForm.content" type="textarea" class="article-textarea" autosize placeholder="请输入内容"/>
-          <span v-show="contentShortLength" class="word-counter">{{ contentShortLength }}字</span>
+        <el-form-item :label="$t('funcMask.log')" label-width="60px" prop="log">
+          <el-input rows="8" type="textarea" class="article-textarea" resize clearable placeholder=""/>
         </el-form-item>
       </div>
     </el-form>
@@ -55,10 +50,6 @@ import axios from 'axios'
 
 const defaultForm = {
   status: 'draft',
-  title: '', // 文章题目
-  addresseeId: '',
-  sender: '',
-  content: '', // 文章内容
   platforms: ['a-platform'],
   comment_disabled: false,
   importance: 0
@@ -90,18 +81,13 @@ export default {
       loading: false,
       userListOptions: [],
       rules: {
-        title: [{ validator: validateRequire }],
-        content: [{ validator: validateRequire }],
-        addresseeId: [{ validator: validateRequire }],
-        sender: [{ validator: validateRequire }]
+        version: [{ validator: validateRequire }],
+        channels: [{ validator: validateRequire }]
       },
       tempRoute: {}
     }
   },
   computed: {
-    contentShortLength() {
-      return this.postForm.content.length
-    },
     lang() {
       return this.$store.getters.language
     }
@@ -130,43 +116,44 @@ export default {
         console.log(err)
       })
     },
-    submitForm() {
-      // this.postForm.display_time = parseInt(this.display_time / 1000)
-      console.log(this.postForm)
+    query() {
+      console.dir(this.postForm)
+      this.postForm.status = 'draft'
       this.$refs.postForm.validate(valid => {
         if (valid) {
           this.loading = true
-          // this.$notify({
-          //   title: '成功',
-          //   message: '发布文章成功',
-          //   type: 'success',
-          //   duration: 2000
-          // })
-          axios.post(
-            'http://127.0.0.1:22222/mail',
-            this.postForm
+          axios.get(
+            'http://120.132.50.206:8585/function.php',
+            {
+              version: this.postForm.version,
+              channel: this.postForm.channels
+            }
           ).then((res) => {
             this.$notify({
               title: '成功',
-              message: '发送邮件成功.',
+              message: '查询成功.',
               type: 'success',
               duration: 4000
             })
+            console.log(res.data)
+            this.postForm.log += res.data.param
+            this.postForm.status = 'published'
           }).catch((error) => {
             this.$notify({
               title: '失败',
-              message: '发送邮件成功失败:' + error,
+              message: '查询失败:' + error,
               type: 'fail',
               duration: 4000
             })
           })
-          this.postForm.status = 'published'
           this.loading = false
         } else {
           console.log('error submit!!')
           return false
         }
       })
+    },
+    publish() {
     }
   }
 }

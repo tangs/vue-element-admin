@@ -90,7 +90,11 @@ export default {
     send: 'send'
   },
   funcMask: {
-    publish: 'publish'
+    query: 'query',
+    publish: 'publish',
+    version: 'version',
+    channels: 'channels',
+    log: 'log'
   },
   documentation: {
     documentation: 'Documentation',
