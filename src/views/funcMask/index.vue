@@ -33,7 +33,7 @@
             {{ $t('mail.title') }}
           </MDinput>
         </el-form-item>
-        <el-form-item :label="$t('funcMask.log')" label-width="60px" prop="log">
+        <el-form-item id="log" :label="$t('funcMask.log')" label-width="60px" prop="log">
           <el-input rows="8" type="textarea" class="article-textarea" resize clearable placeholder=""/>
         </el-form-item>
       </div>
