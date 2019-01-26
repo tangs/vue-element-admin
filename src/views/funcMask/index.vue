@@ -37,6 +37,23 @@
             <el-checkbox label="苹果支付"/>
           </el-checkbox-group>
         </el-row>
+        <el-row>
+          <el-form-item :label="$t('funcMask.hall')"/>
+          <el-checkbox-group v-model="postForm.hall" style="margin-left: 32px;">
+            <el-checkbox label="大风车"/>
+            <el-checkbox label="经典水果机"/>
+            <el-checkbox label="金鲨银鲨"/>
+            <el-checkbox label="奔驰宝马"/>
+            <el-checkbox label="扎金花"/>
+            <el-checkbox label="百人牛牛"/>
+            <el-checkbox label="客服"/>
+            <el-checkbox label="奖励"/>
+            <el-checkbox label="抽奖"/>
+            <el-checkbox label="VIP "/>
+            <el-checkbox label="商店"/>
+            <el-checkbox label="活动"/>
+          </el-checkbox-group>
+        </el-row>
         <el-form-item :label="$t('funcMask.log')" prop="log">
           <el-input v-model="postForm.log" rows="6" type="textarea" class="article-textarea" resize clearable placeholder=""/>
         </el-form-item>
@@ -58,6 +75,7 @@ const defaultForm = {
   channels: '',
   status: 'draft',
   pay: [],
+  hall: [],
   platforms: ['a-platform'],
   comment_disabled: false,
   importance: 0
