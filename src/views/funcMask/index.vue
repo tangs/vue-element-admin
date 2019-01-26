@@ -33,8 +33,8 @@
             {{ $t('mail.title') }}
           </MDinput>
         </el-form-item>
-        <el-form-item id="log" :label="$t('funcMask.log')" label-width="60px" prop="log">
-          <el-input rows="8" type="textarea" class="article-textarea" resize clearable placeholder=""/>
+        <el-form-item :label="$t('funcMask.log')" label-width="60px" prop="log">
+          <el-input v-model="postForm.log" rows="8" type="textarea" class="article-textarea" resize clearable placeholder=""/>
         </el-form-item>
       </div>
     </el-form>
@@ -49,6 +49,9 @@ import { fetchArticle } from '@/api/article'
 import axios from 'axios'
 
 const defaultForm = {
+  log: '',
+  version: '',
+  channels: '',
   status: 'draft',
   platforms: ['a-platform'],
   comment_disabled: false,
@@ -116,35 +119,46 @@ export default {
         console.log(err)
       })
     },
+    appendLog(txt) {
+      this.postForm.log += txt + '\n'
+    },
+    notifySucc(txt) {
+      this.$notify({
+        title: '成功',
+        message: 'succ:' + txt,
+        type: 'succ',
+        duration: 4000
+      })
+    },
+    notifyErr(error) {
+      this.$notify({
+        title: '失败',
+        message: 'err:' + error,
+        type: 'fail',
+        duration: 4000
+      })
+    },
     query() {
       console.dir(this.postForm)
       this.postForm.status = 'draft'
       this.$refs.postForm.validate(valid => {
         if (valid) {
           this.loading = true
-          axios.get(
-            'http://120.132.50.206:8585/function.php',
-            {
-              version: this.postForm.version,
-              channel: this.postForm.channels
-            }
-          ).then((res) => {
-            this.$notify({
-              title: '成功',
-              message: '查询成功.',
-              type: 'success',
-              duration: 4000
-            })
+          console.log('v:' + this.postForm.version)
+          console.log('c:' + this.postForm.channels)
+          const url = `http://120.132.50.206:8585/function.php?version=${this.postForm.version}&channel=${this.postForm.channels}`
+          console.log('url:' + url)
+          axios.get(url).then((res) => {
+            this.notifySucc('')
             console.log(res.data)
-            this.postForm.log += res.data.param
-            this.postForm.status = 'published'
+            if (res.data.result === 'true') {
+              this.appendLog(res.data.param)
+              this.postForm.status = 'published'
+            } else {
+              this.notifyErr(res.data.param)
+            }
           }).catch((error) => {
-            this.$notify({
-              title: '失败',
-              message: '查询失败:' + error,
-              type: 'fail',
-              duration: 4000
-            })
+            this.notifyErr(error)
           })
           this.loading = false
         } else {
