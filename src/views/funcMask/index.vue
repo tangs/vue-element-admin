@@ -10,11 +10,11 @@
       </sticky>
 
       <div class="createPost-main-container">
-        <el-row>
+        <el-row style="margin-top: 32px;">
           <el-col :span="24">
             <div class="postInfo-container">
               <el-row>
-                <el-col :span="4">
+                <el-col :span="6">
                   <el-form-item :label="$t('funcMask.version')" label-width="60px" class="article-textarea" prop="version">
                     <el-input :rows="1" v-model="postForm.version" placeholder="请输入内容"/>
                   </el-form-item>
@@ -28,13 +28,17 @@
             </div>
           </el-col>
         </el-row>
-        <el-form-item style="margin-bottom: 40px;" prop="title">
-          <MDinput v-model="postForm.title" :maxlength="100" name="name" required>
-            {{ $t('mail.title') }}
-          </MDinput>
-        </el-form-item>
-        <el-form-item :label="$t('funcMask.log')" label-width="60px" prop="log">
-          <el-input v-model="postForm.log" rows="8" type="textarea" class="article-textarea" resize clearable placeholder=""/>
+        <el-row>
+          <el-form-item :label="$t('funcMask.pay')"/>
+          <el-checkbox-group v-model="postForm.pay" style="margin-left: 32px;">
+            <el-checkbox label="H5支付宝"/>
+            <el-checkbox label="H5微信"/>
+            <el-checkbox label="微信APP"/>
+            <el-checkbox label="苹果支付"/>
+          </el-checkbox-group>
+        </el-row>
+        <el-form-item :label="$t('funcMask.log')" prop="log">
+          <el-input v-model="postForm.log" rows="6" type="textarea" class="article-textarea" resize clearable placeholder=""/>
         </el-form-item>
       </div>
     </el-form>
@@ -53,9 +57,17 @@ const defaultForm = {
   version: '',
   channels: '',
   status: 'draft',
+  pay: [],
   platforms: ['a-platform'],
   comment_disabled: false,
   importance: 0
+}
+
+const payMap = {
+  commwappayalipay: 'H5支付宝',
+  commwappayweixin: 'H5微信',
+  wechatpp: '微信APP',
+  appstore: '苹果支付'
 }
 
 export default {
@@ -122,6 +134,27 @@ export default {
     appendLog(txt) {
       this.postForm.log += txt + '\n'
     },
+    getPayName(type) {
+      return payMap[type]
+    },
+    getPayType(name) {
+      const keys = Object.keys(payMap)
+      for (let i = 0; i < keys.length; ++i) {
+        const key = keys[i]
+        if (payMap[key] === name) {
+          return key
+        }
+      }
+    },
+    updatePayInfo(payInfos) {
+      const masks = payInfos.split(':')
+      const payMask = []
+      for (let i = 0; i < masks.length; ++i) {
+        const name = this.getPayName(masks[i])
+        payMask.push(name)
+      }
+      this.postForm.pay = payMask
+    },
     notifySucc(txt) {
       this.$notify({
         title: '成功',
@@ -150,12 +183,21 @@ export default {
           console.log('url:' + url)
           axios.get(url).then((res) => {
             this.notifySucc('')
-            console.log(res.data)
-            if (res.data.result === 'true') {
-              this.appendLog(res.data.param)
+            const data = res.data
+            const paramStr = data.param
+            console.log(data)
+            if (data.result === 'true') {
+              this.appendLog(paramStr)
+              const params = JSON.parse(paramStr)
+              for (let i = 0; i < params.length; ++i) {
+                const param = params[i]
+                if (param.type === 'pay') {
+                  this.updatePayInfo(param.value)
+                }
+              }
               this.postForm.status = 'published'
             } else {
-              this.notifyErr(res.data.param)
+              this.notifyErr(paramStr)
             }
           }).catch((error) => {
             this.notifyErr(error)

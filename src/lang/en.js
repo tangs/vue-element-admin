@@ -94,7 +94,8 @@ export default {
     publish: 'publish',
     version: 'version',
     channels: 'channels',
-    log: 'log'
+    log: 'log',
+    pay: 'pay'
   },
   documentation: {
     documentation: 'Documentation',
