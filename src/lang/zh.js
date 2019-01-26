@@ -89,6 +89,15 @@ export default {
     content: '内容',
     send: '发送'
   },
+  funcMask: {
+    query: '查询',
+    publish: '发布',
+    version: '版本号',
+    channels: '渠道号',
+    log: '日志',
+    pay: '支付',
+    hall: '大厅'
+  },
   documentation: {
     documentation: '文档',
     github: 'Github 地址'

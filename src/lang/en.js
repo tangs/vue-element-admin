@@ -95,7 +95,8 @@ export default {
     version: 'version',
     channels: 'channels',
     log: 'log',
-    pay: 'pay'
+    pay: 'pay',
+    hall: 'hall'
   },
   documentation: {
     documentation: 'Documentation',
