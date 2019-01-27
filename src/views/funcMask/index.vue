@@ -29,7 +29,8 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-form-item :label="$t('funcMask.pay')"/>
+          <el-checkbox :label="$t('funcMask.pay')" v-model="postForm.paySelected"/>
+          <!-- <el-form-item :label="$t('funcMask.pay')"/> -->
           <el-checkbox-group v-model="postForm.pay" style="margin-left: 32px;">
             <el-checkbox label="H5支付宝"/>
             <el-checkbox label="H5微信"/>
@@ -38,7 +39,8 @@
           </el-checkbox-group>
         </el-row>
         <el-row>
-          <el-form-item :label="$t('funcMask.hall')"/>
+          <!-- <el-form-item :label="$t('funcMask.hall')"/> -->
+          <el-checkbox :label="$t('funcMask.hall')" v-model="postForm.hallSelected"/>
           <el-checkbox-group v-model="postForm.hall" style="margin-left: 32px;">
             <el-checkbox label="大风车"/>
             <el-checkbox label="经典水果机"/>
@@ -68,12 +70,15 @@ import MDinput from '@/components/MDinput'
 import Sticky from '@/components/Sticky' // 粘性header组件
 import { fetchArticle } from '@/api/article'
 import axios from 'axios'
+import cookie from 'js-cookie'
 
 const defaultForm = {
   log: '',
   version: '',
   channels: '',
   status: 'draft',
+  paySelected: false,
+  hallSelected: false,
   pay: [],
   hall: [],
   platforms: ['a-platform'],
@@ -228,6 +233,60 @@ export default {
       })
     },
     publish() {
+      console.dir(this.postForm)
+      this.postForm.status = 'draft'
+      this.$refs.postForm.validate(valid => {
+        if (valid) {
+          this.loading = true
+          const postData1 = {
+            username: 'admin',
+            token: cookie.get('server_token_key'),
+            version: this.postForm.version,
+            channel: this.postForm.channels,
+            type: 'pay',
+            value: ''
+          }
+          const paySelects = this.postForm.pay
+          for (let i = 0; i < paySelects.length; ++i) {
+            if (i > 0) {
+              postData1.value += ':'
+            }
+            postData1.value += this.getPayType(paySelects[i])
+          }
+          // console.dir(postData)
+          const postData = `username=${postData1.username}&token=${postData1.token}&version=${postData1.version}&channel=${postData1.channel}&type=${postData1.type}&value=${postData1.value}`
+          console.log(postData)
+          const url = 'http://120.132.50.206:8585/function.php'
+          axios.post(
+            url,
+            postData
+          ).then((res) => {
+            this.notifySucc('')
+            const data = res.data
+            const paramStr = data.param
+            console.log(data)
+            if (data.result === 'true') {
+              this.appendLog(paramStr)
+              // const params = JSON.parse(paramStr)
+              // for (let i = 0; i < params.length; ++i) {
+              //   const param = params[i]
+              //   if (param.type === 'pay') {
+              //     this.updatePayInfo(param.value)
+              //   }
+              // }
+              this.postForm.status = 'published'
+            } else {
+              this.notifyErr(paramStr)
+            }
+          }).catch((error) => {
+            this.notifyErr(error)
+          })
+          this.loading = false
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
     }
   }
 }

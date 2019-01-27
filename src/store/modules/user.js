@@ -70,9 +70,9 @@ const user = {
           const str = JSON.stringify(resData)
           console.log('res:' + str)
           if (resData.result === 'true') {
+            cookie.set('server_token_key', resData.param)
             loginByUsername(username, userInfo.password).then(response => {
               const data = response.data
-              cookie.set('server_token_key', data.param)
               commit('SET_TOKEN', data.token)
               setToken(response.data.token)
               resolve()
