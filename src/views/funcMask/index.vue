@@ -200,8 +200,8 @@ export default {
       this.$refs.postForm.validate(valid => {
         if (valid) {
           this.loading = true
-          console.log('v:' + this.postForm.version)
-          console.log('c:' + this.postForm.channels)
+          // console.log('v:' + this.postForm.version)
+          // console.log('c:' + this.postForm.channels)
           const url = `http://120.132.50.206:8585/function.php?version=${this.postForm.version}&channel=${this.postForm.channels}`
           console.log('url:' + url)
           axios.get(url).then((res) => {
