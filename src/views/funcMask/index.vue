@@ -225,10 +225,6 @@ export default {
       return payMap[type]
     },
     getPayType(name) {
-      // const idx = name.indexOf('[')
-      // if (idx !== -1) {
-      //   name = name.substr(0, idx)
-      // }
       return this.getKeyByValue(payMap, name)
     },
     getHallName(type) {
@@ -252,6 +248,12 @@ export default {
     updteHallInfo(hallInfos) {
       this.postForm.hall = this.getMasks(hallInfos, this.getHallName)
     },
+    getPaySeletced() {
+      return this.postForm.paySelected ? this.postForm.pay : []
+    },
+    getHallSeletced() {
+      return this.postForm.hallSelected ? this.postForm.hall : []
+    },
     clearPayInfo() {
       this.postForm.pay = []
     },
@@ -274,7 +276,34 @@ export default {
         duration: 4000
       })
     },
-    publishData(postData1) {
+    getChannels() {
+      const channels = []
+      const arr = this.postForm.channels.split(';')
+      for (let i = 0; i < arr.length; ++i) {
+        const channel = arr[i]
+        const values = channel.split('-')
+        switch (values.length) {
+          case 1:
+            channels.push(values[0])
+            break
+          case 2: {
+            const num1 = Number.parseInt(values[0])
+            const num2 = Number.parseInt(values[1])
+            if (num1 > num2) {
+              continue
+            }
+            for (let num = num1; num <= num2; ++num) {
+              let txt = '' + num
+              txt = '000'.substr(txt.length) + num
+              channels.push(txt)
+            }
+          }
+            break
+        }
+      }
+      return channels
+    },
+    publishData(postData1, callback) {
       const postData = `username=${postData1.username}&token=${postData1.token}&version=${postData1.version}&channel=${postData1.channel}&type=${postData1.type}&value=${postData1.value}`
       console.log(postData)
       const url = 'http://120.132.50.206:8585/function.php'
@@ -282,7 +311,7 @@ export default {
         url,
         postData
       ).then((res) => {
-        this.notifySucc('')
+        // this.notifySucc('')
         const data = res.data
         const paramStr = data.param
         console.log(data)
@@ -292,13 +321,18 @@ export default {
           data.token = undefined
           this.appendLog('publish:' + JSON.stringify(data))
           this.postForm.status = 'published'
+          callback(true)
         } else {
           this.notifyErr(paramStr)
+          this.appendLog('发布错误:' + paramStr + '.' + '(version=${postData1.version}&channel=${postData1.channel})')
+          callback(false, paramStr)
         }
-        this.loading = false
+        // this.loading = false
       }).catch((error) => {
         this.notifyErr(error)
-        this.loading = false
+        this.appendLog('发布错误:' + error + '.' + '(version=${postData1.version}&channel=${postData1.channel})')
+        callback(false, error)
+        // this.loading = false
       })
     },
     query() {
@@ -307,34 +341,54 @@ export default {
       this.$refs.postForm.validate(valid => {
         if (valid) {
           this.loading = true
-          const url = `http://120.132.50.206:8585/function.php?version=${this.postForm.version}&channel=${this.postForm.channels}`
-          console.log('url:' + url)
-          axios.get(url).then((res) => {
-            this.notifySucc('')
-            const data = res.data
-            const paramStr = data.param
-            console.log(data)
-            if (data.result === 'true') {
-              this.appendLog('query:' + paramStr)
-              const params = JSON.parse(paramStr)
-              this.clearPayInfo()
-              this.clearHallInfo()
-              for (let i = 0; i < params.length; ++i) {
-                const param = params[i]
-                if (param.type === 'pay') {
-                  this.updatePayInfo(param.value)
-                } else if (param.type === 'hall') {
-                  this.updteHallInfo(param.value)
-                }
+          const channels = this.getChannels()
+          let surplus = channels.length
+          console.dir(channels)
+          const version = this.postForm.version
+          for (let i = 0; i < channels.length; ++i) {
+            const channel = channels[i]
+            const url = `http://120.132.50.206:8585/function.php?version=${version}&channel=${channel}`
+            console.log('url:' + url)
+            axios.get(url).then((res) => {
+              // this.notifySucc('')
+              if (surplus === 1) {
+                this.notifySucc('查询完成')
               }
-              this.postForm.status = 'published'
-            } else {
-              this.notifyErr(paramStr)
-            }
-          }).catch((error) => {
-            this.notifyErr(error)
-          })
-          this.loading = false
+              const data = res.data
+              const paramStr = data.param
+              console.log(data)
+              if (data.result === 'true') {
+                this.appendLog('query:' + paramStr)
+                const params = JSON.parse(paramStr)
+                this.clearPayInfo()
+                this.clearHallInfo()
+                for (let i = 0; i < params.length; ++i) {
+                  const param = params[i]
+                  if (channels.length === 1) {
+                    if (param.type === 'pay') {
+                      this.updatePayInfo(param.value)
+                    } else if (param.type === 'hall') {
+                      this.updteHallInfo(param.value)
+                    }
+                  }
+                }
+                this.postForm.status = 'published'
+              } else {
+                this.notifyErr(paramStr)
+                this.appendLog('查询错误:' + paramStr + '.' + '(version=${version}&channel=${channel})')
+              }
+              if (--surplus === 0) {
+                this.loading = false
+              }
+            }).catch((error) => {
+              this.notifyErr(error)
+              this.appendLog('查询错误:' + error + '.' + '(version=${version}&channel=${channel})')
+              if (--surplus === 0) {
+                this.loading = false
+              }
+            })
+          }
+          // this.loading = false
         } else {
           console.log('error submit!!')
           return false
@@ -345,6 +399,11 @@ export default {
       console.dir(this.postForm)
       this.$refs.postForm.validate(valid => {
         if (valid) {
+          const pays = this.getPaySeletced()
+          const halls = this.getHallSeletced()
+          if (pays.length === 0 && halls.length === 0) {
+            return
+          }
           const postData1 = {
             username: 'admin',
             token: cookie.get('server_token_key'),
@@ -352,6 +411,15 @@ export default {
             channel: this.postForm.channels,
             type: '',
             value: ''
+          }
+          const cp = (src) => {
+            const dest = {}
+            const keys = Object.keys(src)
+            for (var i = 0; i < keys.length; ++i) {
+              const k = keys[i]
+              dest[k] = src[k]
+            }
+            return dest
           }
           const getValues = (selects, func) => {
             let value = ''
@@ -370,18 +438,56 @@ export default {
             }
             return value
           }
-          if (this.postForm.paySelected) {
-            postData1.value = getValues(this.postForm.pay, this.getPayType)
-            postData1.type = 'pay'
-            this.publishData(postData1)
-            this.loading = true
+          const alert = []
+          alert.push(`确定对版本号:${this.postForm.version}    渠道号:${this.postForm.channels}    做出以下修改?`)
+          if (halls.length) {
+            alert.push('大厅:' + halls)
           }
-          if (this.postForm.hallSelected) {
-            postData1.value = getValues(this.postForm.hall, this.getHallType)
-            postData1.type = 'hall'
-            this.publishData(postData1)
-            this.loading = true
+          if (pays.length) {
+            alert.push('支付:' + pays)
           }
+          const newDatas = []
+          const h = this.$createElement
+          for (const i in alert) {
+            newDatas.push(h('p', null, alert[i]))
+          }
+          this.$confirm('提示', {
+            message: h('div', null, newDatas),
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            const channels = this.getChannels()
+            let surplus = 0
+            console.dir(channels)
+            const callback = (ret, error) => {
+              if (--surplus === 0) {
+                this.loading = false
+                this.notifySucc('发布完成')
+              }
+            }
+            for (let i = 0; i < channels.length; ++i) {
+              const channel = channels[i]
+              const postData = cp(postData1)
+              postData.channel = channel
+              if (pays.length) {
+                postData.value = getValues(pays, this.getPayType)
+                postData.type = 'pay'
+                this.publishData(postData, callback)
+                ++surplus
+              }
+              if (halls.length) {
+                postData.value = getValues(halls, this.getHallType)
+                postData.type = 'hall'
+                this.publishData(postData, callback)
+                ++surplus
+              }
+            }
+            if (surplus) {
+              this.loading = true
+            }
+          }).catch(() => {
+          })
         } else {
           console.log('error submit!!')
           return false
