@@ -365,9 +365,9 @@ export default {
                 for (let i = 0; i < params.length; ++i) {
                   const param = params[i]
                   if (channels.length === 1) {
-                    if (param.type === 'pay') {
+                    if (param.type === 'pay' && this.postForm.paySelected) {
                       this.updatePayInfo(param.value)
-                    } else if (param.type === 'hall') {
+                    } else if (param.type === 'hall' && this.postForm.hallSelected) {
                       this.updteHallInfo(param.value)
                     }
                   }
@@ -476,10 +476,11 @@ export default {
                 this.publishData(postData, callback)
                 ++surplus
               }
+              const postDataHall = cp(postData)
               if (halls.length) {
-                postData.value = getValues(halls, this.getHallType)
-                postData.type = 'hall'
-                this.publishData(postData, callback)
+                postDataHall.value = getValues(halls, this.getHallType)
+                postDataHall.type = 'hall'
+                this.publishData(postDataHall, callback)
                 ++surplus
               }
             }
