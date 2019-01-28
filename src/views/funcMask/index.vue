@@ -360,8 +360,14 @@ export default {
               if (data.result === 'true') {
                 this.appendLog('query:' + paramStr)
                 const params = JSON.parse(paramStr)
-                this.clearPayInfo()
-                this.clearHallInfo()
+                if (channels.length === 1) {
+                  if (this.postForm.paySelected) {
+                    this.clearPayInfo()
+                  }
+                  if (this.postForm.hallSelected) {
+                    this.clearHallInfo()
+                  }
+                }
                 for (let i = 0; i < params.length; ++i) {
                   const param = params[i]
                   if (channels.length === 1) {
