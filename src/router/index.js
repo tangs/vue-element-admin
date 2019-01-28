@@ -65,30 +65,34 @@ export const constantRouterMap = [
   },
   {
     path: '',
-    component: Layout,
-    redirect: 'dashboard',
-    children: [
-      {
-        path: 'dashboard',
-        component: () => import('@/views/dashboard/index'),
-        name: 'Dashboard',
-        meta: { title: 'dashboard', icon: 'dashboard', noCache: true }
-      }
-    ]
+    redirect: '/funcMask'
   },
-  {
-    path: '/mail',
-    component: Layout,
-    redirect: '/mail/index',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/mail/index'),
-        name: 'Mail',
-        meta: { title: 'mail', icon: 'mail', noCache: true }
-      }
-    ]
-  },
+  // {
+  //   path: '',
+  //   component: Layout,
+  //   redirect: 'dashboard',
+  //   children: [
+  //     {
+  //       path: 'dashboard',
+  //       component: () => import('@/views/dashboard/index'),
+  //       name: 'Dashboard',
+  //       meta: { title: 'dashboard', icon: 'dashboard', noCache: true }
+  //     }
+  //   ]
+  // },
+  // {
+  //   path: '/mail',
+  //   component: Layout,
+  //   redirect: '/mail/index',
+  //   children: [
+  //     {
+  //       path: 'index',
+  //       component: () => import('@/views/mail/index'),
+  //       name: 'Mail',
+  //       meta: { title: 'mail', icon: 'mail', noCache: true }
+  //     }
+  //   ]
+  // },
   {
     path: '/funcMask',
     component: Layout,
