@@ -14,12 +14,14 @@
           <el-col :span="24">
             <div class="postInfo-container">
               <el-row>
-                <el-col :span="6">
+                <el-col>
                   <el-form-item :label="$t('funcMask.version')" label-width="60px" class="article-textarea" prop="version">
                     <el-input :rows="1" v-model="postForm.version" placeholder="请输入内容"/>
                   </el-form-item>
                 </el-col>
-                <el-col :span="15" style="margin-left: 32px;">
+              </el-row>
+              <el-row>
+                <el-col>
                   <el-form-item :label="$t('funcMask.channels')" label-width="65px" class="article-textarea" prop="channels">
                     <el-input :rows="1" v-model="postForm.channels" placeholder="请输入内容"/>
                   </el-form-item>
@@ -31,14 +33,14 @@
         <el-row>
           <el-checkbox :label="$t('funcMask.pay')" v-model="postForm.paySelected" @change="handlePaySelectedChange"/>
           <el-checkbox-group v-model="postForm.pay" style="margin-left: 32px;">
-            <el-checkbox v-for="pay in payNames" :label="pay.v" :key="pay.k" style="width: 250px">{{ pay.v }}[{{ pay.k }}]</el-checkbox>
+            <el-checkbox v-for="pay in payNames" :label="pay.v" :key="pay.k" style="width: 220px">{{ pay.v }}[{{ pay.k }}]</el-checkbox>
           </el-checkbox-group>
         </el-row>
         <el-row>
           <el-checkbox :label="$t('funcMask.hall')" v-model="postForm.hallSelected" @change="handleHallSelectedChange"/>
           <div class="checkbox-group" style="margin-left: 32px;">
             <el-checkbox-group v-model="postForm.hall">
-              <el-checkbox v-for="funcName in hallNames" :label="funcName" :key="funcName" style="width: 150px">{{ funcName }}</el-checkbox>
+              <el-checkbox v-for="funcName in hallNames" :label="funcName" :key="funcName" style="width: 130px">{{ funcName }}</el-checkbox>
             </el-checkbox-group>
           </div>
         </el-row>
