@@ -32,10 +32,7 @@
           <el-checkbox :label="$t('funcMask.pay')" v-model="postForm.paySelected"/>
           <!-- <el-form-item :label="$t('funcMask.pay')"/> -->
           <el-checkbox-group v-model="postForm.pay" style="margin-left: 32px;">
-            <el-checkbox label="H5支付宝" style="width: 150px"/>
-            <el-checkbox label="H5微信" style="width: 150px"/>
-            <el-checkbox label="微信APP" style="width: 150px"/>
-            <el-checkbox label="苹果支付" style="width: 150px"/>
+            <el-checkbox v-for="payName in payNames" :label="payName" :key="payName" style="width: 150px">{{ payName }}</el-checkbox>
           </el-checkbox-group>
         </el-row>
         <el-row>
@@ -43,37 +40,7 @@
           <el-checkbox :label="$t('funcMask.hall')" v-model="postForm.hallSelected"/>
           <div class="checkbox-group" style="margin-left: 32px;">
             <el-checkbox-group v-model="postForm.hall">
-              <el-checkbox label="大风车" style="width: 150px"/>
-              <el-checkbox label="经典水果机" style="width: 150px"/>
-              <el-checkbox label="金鲨银鲨" style="width: 150px"/>
-              <el-checkbox label="奔驰宝马" style="width: 150px"/>
-              <el-checkbox label="扎金花" style="width: 150px"/>
-              <el-checkbox label="百人牛牛" style="width: 150px"/>
-              <el-checkbox label="客服" style="width: 150px"/>
-              <el-checkbox label="奖励" style="width: 150px"/>
-              <el-checkbox label="抽奖" style="width: 150px"/>
-              <el-checkbox label="VIP " style="width: 150px"/>
-              <el-checkbox label="商店" style="width: 150px"/>
-              <el-checkbox label="活动" style="width: 150px"/>
-              <el-checkbox label="排行" style="width: 150px"/>
-              <el-checkbox label="更多" style="width: 150px"/>
-              <el-checkbox label="邮件" style="width: 150px"/>
-              <el-checkbox label="绑定手机" style="width: 150px"/>
-              <el-checkbox label="黄金矿工" style="width: 150px"/>
-              <el-checkbox label="聊天" style="width: 150px"/>
-              <el-checkbox label="快速开始" style="width: 150px"/>
-              <el-checkbox label="下载" style="width: 150px"/>
-              <el-checkbox label="评论" style="width: 150px"/>
-              <el-checkbox label="快速支付" style="width: 150px"/>
-              <el-checkbox label="捕鱼" style="width: 150px"/>
-              <el-checkbox label="拉霸" style="width: 150px"/>
-              <el-checkbox label="钻石购买" style="width: 150px"/>
-              <el-checkbox label="特殊捕鱼-更多" style="width: 150px"/>
-              <el-checkbox label="特殊捕鱼-普通大厅" style="width: 150px"/>
-              <el-checkbox label="特殊捕鱼-弹出礼包" style="width: 150px"/>
-              <el-checkbox label="扎金花中-贵宾厅" style="width: 150px"/>
-              <el-checkbox label="星座场" style="width: 150px"/>
-              <el-checkbox label="气球场" style="width: 150px"/>
+              <el-checkbox v-for="funcName in hallNames" :label="funcName" :key="funcName" style="width: 150px">{{ funcName }}</el-checkbox>
             </el-checkbox-group>
           </div>
         </el-row>
@@ -110,8 +77,25 @@ const defaultForm = {
 const payMap = {
   commwappayalipay: 'H5支付宝',
   commwappayweixin: 'H5微信',
+  commwappayunionpay: 'H5银联',
+  wechat: '微信',
   wechatpp: '微信APP',
-  appstore: '苹果支付'
+  appstore: '苹果支付',
+  samsung: '三星',
+  xiaomi: '小米',
+  ysdk: 'ysdk',
+  vivo: 'vivo',
+  jinli: '金立',
+  huawei: '华为',
+  uc: 'uc',
+  jolo: 'jolo',
+  ptpay: 'ptpay',
+  baidu_new: '百度(新)',
+  anzhi: 'anzhi',
+  niux: 'niux',
+  letv: '乐视',
+  360: '360',
+  baidu: '百度'
 }
 
 const hallMap = {
@@ -159,6 +143,18 @@ export default {
     }
   },
   data() {
+    const payNames = []
+    let keys = Object.keys(payMap)
+    for (let i = 0; i < keys.length; ++i) {
+      const key = keys[i]
+      payNames.push(payMap[key])
+    }
+    const hallNames = []
+    keys = Object.keys(hallMap)
+    for (let i = 0; i < keys.length; ++i) {
+      const key = keys[i]
+      hallNames.push(hallMap[key])
+    }
     const validateRequire = (rule, value, callback) => {
       if (value === '') {
         this.$message({
@@ -174,6 +170,8 @@ export default {
       postForm: Object.assign({}, defaultForm),
       loading: false,
       userListOptions: [],
+      payNames: payNames,
+      hallNames: hallNames,
       rules: {
         version: [{ validator: validateRequire }],
         channels: [{ validator: validateRequire }]
