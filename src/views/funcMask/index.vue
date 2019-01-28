@@ -30,13 +30,11 @@
         </el-row>
         <el-row>
           <el-checkbox :label="$t('funcMask.pay')" v-model="postForm.paySelected"/>
-          <!-- <el-form-item :label="$t('funcMask.pay')"/> -->
           <el-checkbox-group v-model="postForm.pay" style="margin-left: 32px;">
-            <el-checkbox v-for="payName in payNames" :label="payName" :key="payName" style="width: 150px">{{ payName }}</el-checkbox>
+            <el-checkbox v-for="pay in payNames" :label="pay.v" :key="pay.k" style="width: 250px">{{ pay.v }}[{{ pay.k }}]</el-checkbox>
           </el-checkbox-group>
         </el-row>
         <el-row>
-          <!-- <el-form-item :label="$t('funcMask.hall')"/> -->
           <el-checkbox :label="$t('funcMask.hall')" v-model="postForm.hallSelected"/>
           <div class="checkbox-group" style="margin-left: 32px;">
             <el-checkbox-group v-model="postForm.hall">
@@ -147,7 +145,10 @@ export default {
     let keys = Object.keys(payMap)
     for (let i = 0; i < keys.length; ++i) {
       const key = keys[i]
-      payNames.push(payMap[key])
+      payNames.push({
+        k: key,
+        v: payMap[key]
+      })
     }
     const hallNames = []
     keys = Object.keys(hallMap)
@@ -224,6 +225,10 @@ export default {
       return payMap[type]
     },
     getPayType(name) {
+      // const idx = name.indexOf('[')
+      // if (idx !== -1) {
+      //   name = name.substr(0, idx)
+      // }
       return this.getKeyByValue(payMap, name)
     },
     getHallName(type) {
