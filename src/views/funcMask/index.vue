@@ -32,48 +32,50 @@
           <el-checkbox :label="$t('funcMask.pay')" v-model="postForm.paySelected"/>
           <!-- <el-form-item :label="$t('funcMask.pay')"/> -->
           <el-checkbox-group v-model="postForm.pay" style="margin-left: 32px;">
-            <el-checkbox label="H5支付宝"/>
-            <el-checkbox label="H5微信"/>
-            <el-checkbox label="微信APP"/>
-            <el-checkbox label="苹果支付"/>
+            <el-checkbox label="H5支付宝" style="width: 150px"/>
+            <el-checkbox label="H5微信" style="width: 150px"/>
+            <el-checkbox label="微信APP" style="width: 150px"/>
+            <el-checkbox label="苹果支付" style="width: 150px"/>
           </el-checkbox-group>
         </el-row>
         <el-row>
           <!-- <el-form-item :label="$t('funcMask.hall')"/> -->
           <el-checkbox :label="$t('funcMask.hall')" v-model="postForm.hallSelected"/>
-          <el-checkbox-group v-model="postForm.hall" style="margin-left: 32px;">
-            <el-checkbox label="大风车"/>
-            <el-checkbox label="经典水果机"/>
-            <el-checkbox label="金鲨银鲨"/>
-            <el-checkbox label="奔驰宝马"/>
-            <el-checkbox label="扎金花"/>
-            <el-checkbox label="百人牛牛"/>
-            <el-checkbox label="客服"/>
-            <el-checkbox label="奖励"/>
-            <el-checkbox label="抽奖"/>
-            <el-checkbox label="VIP "/>
-            <el-checkbox label="商店"/>
-            <el-checkbox label="活动"/>
-            <el-checkbox label="排行"/>
-            <el-checkbox label="更多"/>
-            <el-checkbox label="邮件"/>
-            <el-checkbox label="绑定手机"/>
-            <el-checkbox label="黄金矿工"/>
-            <el-checkbox label="聊天"/>
-            <el-checkbox label="快速开始"/>
-            <el-checkbox label="下载"/>
-            <el-checkbox label="评论"/>
-            <el-checkbox label="快速支付"/>
-            <el-checkbox label="捕鱼"/>
-            <el-checkbox label="拉霸"/>
-            <el-checkbox label="钻石购买"/>
-            <el-checkbox label="特殊捕鱼版本-更多"/>
-            <el-checkbox label="特殊捕鱼版本-普通大厅"/>
-            <el-checkbox label="特殊捕鱼版本-弹出礼包"/>
-            <el-checkbox label="扎金花中-贵宾厅"/>
-            <el-checkbox label="星座场"/>
-            <el-checkbox label="气球场"/>
-          </el-checkbox-group>
+          <div class="checkbox-group" style="margin-left: 32px;">
+            <el-checkbox-group v-model="postForm.hall">
+              <el-checkbox label="大风车" style="width: 150px"/>
+              <el-checkbox label="经典水果机" style="width: 150px"/>
+              <el-checkbox label="金鲨银鲨" style="width: 150px"/>
+              <el-checkbox label="奔驰宝马" style="width: 150px"/>
+              <el-checkbox label="扎金花" style="width: 150px"/>
+              <el-checkbox label="百人牛牛" style="width: 150px"/>
+              <el-checkbox label="客服" style="width: 150px"/>
+              <el-checkbox label="奖励" style="width: 150px"/>
+              <el-checkbox label="抽奖" style="width: 150px"/>
+              <el-checkbox label="VIP " style="width: 150px"/>
+              <el-checkbox label="商店" style="width: 150px"/>
+              <el-checkbox label="活动" style="width: 150px"/>
+              <el-checkbox label="排行" style="width: 150px"/>
+              <el-checkbox label="更多" style="width: 150px"/>
+              <el-checkbox label="邮件" style="width: 150px"/>
+              <el-checkbox label="绑定手机" style="width: 150px"/>
+              <el-checkbox label="黄金矿工" style="width: 150px"/>
+              <el-checkbox label="聊天" style="width: 150px"/>
+              <el-checkbox label="快速开始" style="width: 150px"/>
+              <el-checkbox label="下载" style="width: 150px"/>
+              <el-checkbox label="评论" style="width: 150px"/>
+              <el-checkbox label="快速支付" style="width: 150px"/>
+              <el-checkbox label="捕鱼" style="width: 150px"/>
+              <el-checkbox label="拉霸" style="width: 150px"/>
+              <el-checkbox label="钻石购买" style="width: 150px"/>
+              <el-checkbox label="特殊捕鱼-更多" style="width: 150px"/>
+              <el-checkbox label="特殊捕鱼-普通大厅" style="width: 150px"/>
+              <el-checkbox label="特殊捕鱼-弹出礼包" style="width: 150px"/>
+              <el-checkbox label="扎金花中-贵宾厅" style="width: 150px"/>
+              <el-checkbox label="星座场" style="width: 150px"/>
+              <el-checkbox label="气球场" style="width: 150px"/>
+            </el-checkbox-group>
+          </div>
         </el-row>
         <el-form-item :label="$t('funcMask.log')" prop="log">
           <el-input v-model="postForm.log" rows="6" type="textarea" class="article-textarea" resize clearable placeholder=""/>
@@ -96,8 +98,8 @@ const defaultForm = {
   version: '',
   channels: '',
   status: 'draft',
-  paySelected: false,
-  hallSelected: false,
+  paySelected: true,
+  hallSelected: true,
   pay: [],
   hall: [],
   platforms: ['a-platform'],
@@ -139,9 +141,9 @@ const hallMap = {
   '<32': '捕鱼',
   '<33': '拉霸',
   '<34': '钻石购买',
-  '<36': '特殊捕鱼版本-更多',
-  '<37': '特殊捕鱼版本-普通大厅',
-  '<38': '特殊捕鱼版本-弹出礼包',
+  '<36': '特殊捕鱼-更多',
+  '<37': '特殊捕鱼-普通大厅',
+  '<38': '特殊捕鱼-弹出礼包',
   '<39': '扎金花-贵宾厅',
   '<40': '星座场',
   '<41': '气球场'
@@ -269,14 +271,36 @@ export default {
         duration: 4000
       })
     },
+    publishData(postData1) {
+      const postData = `username=${postData1.username}&token=${postData1.token}&version=${postData1.version}&channel=${postData1.channel}&type=${postData1.type}&value=${postData1.value}`
+      console.log(postData)
+      const url = 'http://120.132.50.206:8585/function.php'
+      axios.post(
+        url,
+        postData
+      ).then((res) => {
+        this.notifySucc('')
+        const data = res.data
+        const paramStr = data.param
+        console.log(data)
+        if (data.result === 'true') {
+          this.appendLog(paramStr)
+          this.postForm.status = 'published'
+        } else {
+          this.notifyErr(paramStr)
+        }
+        this.loading = false
+      }).catch((error) => {
+        this.notifyErr(error)
+        this.loading = false
+      })
+    },
     query() {
       console.dir(this.postForm)
       this.postForm.status = 'draft'
       this.$refs.postForm.validate(valid => {
         if (valid) {
           this.loading = true
-          // console.log('v:' + this.postForm.version)
-          // console.log('c:' + this.postForm.channels)
           const url = `http://120.132.50.206:8585/function.php?version=${this.postForm.version}&channel=${this.postForm.channels}`
           console.log('url:' + url)
           axios.get(url).then((res) => {
@@ -313,49 +337,45 @@ export default {
     },
     publish() {
       console.dir(this.postForm)
-      this.postForm.status = 'draft'
       this.$refs.postForm.validate(valid => {
         if (valid) {
-          this.loading = true
           const postData1 = {
             username: 'admin',
             token: cookie.get('server_token_key'),
             version: this.postForm.version,
             channel: this.postForm.channels,
-            type: 'pay',
+            type: '',
             value: ''
           }
-          if (this.postForm.paySelected) {
-            const paySelects = this.postForm.pay
-            for (let i = 0; i < paySelects.length; ++i) {
-              if (i > 0) {
-                postData1.value += ':'
+          const getValues = (selects, func) => {
+            let value = ''
+            let isFirst = true
+            for (let i = 0; i < selects.length; ++i) {
+              const type = func(selects[i])
+              if (type == null) {
+                continue
               }
-              postData1.value += this.getPayType(paySelects[i])
+              if (isFirst) {
+                isFirst = false
+              } else {
+                value += ':'
+              }
+              value += type
             }
+            return value
           }
-          // console.dir(postData)
-          const postData = `username=${postData1.username}&token=${postData1.token}&version=${postData1.version}&channel=${postData1.channel}&type=${postData1.type}&value=${postData1.value}`
-          console.log(postData)
-          const url = 'http://120.132.50.206:8585/function.php'
-          axios.post(
-            url,
-            postData
-          ).then((res) => {
-            this.notifySucc('')
-            const data = res.data
-            const paramStr = data.param
-            console.log(data)
-            if (data.result === 'true') {
-              this.appendLog(paramStr)
-              this.postForm.status = 'published'
-            } else {
-              this.notifyErr(paramStr)
-            }
-          }).catch((error) => {
-            this.notifyErr(error)
-          })
-          this.loading = false
+          if (this.postForm.paySelected) {
+            postData1.value = getValues(this.postForm.pay, this.getPayType)
+            postData1.type = 'pay'
+            this.publishData(postData1)
+            this.loading = true
+          }
+          if (this.postForm.hallSelected) {
+            postData1.value = getValues(this.postForm.hall, this.getHallType)
+            postData1.type = 'hall'
+            this.publishData(postData1)
+            this.loading = true
+          }
         } else {
           console.log('error submit!!')
           return false
@@ -387,5 +407,11 @@ export default {
     right: -10px;
     top: 0px;
   }
+}
+.el-checkbox+.el-checkbox {
+margin-left: 0px;
+}
+.el-checkbox {
+margin-right: 25px;
 }
 </style>
