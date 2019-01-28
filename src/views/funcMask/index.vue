@@ -282,7 +282,10 @@ export default {
         const paramStr = data.param
         console.log(data)
         if (data.result === 'true') {
-          this.appendLog(paramStr)
+          const data = postData1
+          data.username = undefined
+          data.token = undefined
+          this.appendLog('publish:' + JSON.stringify(data))
           this.postForm.status = 'published'
         } else {
           this.notifyErr(paramStr)
@@ -307,7 +310,7 @@ export default {
             const paramStr = data.param
             console.log(data)
             if (data.result === 'true') {
-              this.appendLog(paramStr)
+              this.appendLog('query:' + paramStr)
               const params = JSON.parse(paramStr)
               this.clearPayInfo()
               this.clearHallInfo()
