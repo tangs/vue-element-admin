@@ -29,13 +29,13 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-checkbox :label="$t('funcMask.pay')" v-model="postForm.paySelected"/>
+          <el-checkbox :label="$t('funcMask.pay')" v-model="postForm.paySelected" @change="handlePaySelectedChange"/>
           <el-checkbox-group v-model="postForm.pay" style="margin-left: 32px;">
             <el-checkbox v-for="pay in payNames" :label="pay.v" :key="pay.k" style="width: 250px">{{ pay.v }}[{{ pay.k }}]</el-checkbox>
           </el-checkbox-group>
         </el-row>
         <el-row>
-          <el-checkbox :label="$t('funcMask.hall')" v-model="postForm.hallSelected"/>
+          <el-checkbox :label="$t('funcMask.hall')" v-model="postForm.hallSelected" @change="handleHallSelectedChange"/>
           <div class="checkbox-group" style="margin-left: 32px;">
             <el-checkbox-group v-model="postForm.hall">
               <el-checkbox v-for="funcName in hallNames" :label="funcName" :key="funcName" style="width: 150px">{{ funcName }}</el-checkbox>
@@ -209,6 +209,16 @@ export default {
         console.log(err)
       })
     },
+    handlePaySelectedChange() {
+      if (!this.postForm.paySelected) {
+        this.postForm.pay = []
+      }
+    },
+    handleHallSelectedChange() {
+      if (!this.postForm.hallSelected) {
+        this.postForm.hall = []
+      }
+    },
     appendLog(txt) {
       this.postForm.log += txt + '\n'
     },
@@ -263,7 +273,7 @@ export default {
     notifySucc(txt) {
       this.$notify({
         title: '成功',
-        message: 'succ:' + txt,
+        message: '' + txt,
         type: 'succ',
         duration: 4000
       })
@@ -271,10 +281,23 @@ export default {
     notifyErr(error) {
       this.$notify({
         title: '失败',
-        message: 'err:' + error,
+        message: '' + error,
         type: 'fail',
         duration: 4000
       })
+    },
+    getVersion() {
+      const ver = this.postForm.version
+      let verNum = 0
+      if (ver.length > 0) {
+        const arr = ver.split('.')
+        let base = 1
+        for (let i = arr.length - 1; i >= 0; --i) {
+          verNum += Number.parseInt(arr[i]) * base
+          base *= 100
+        }
+      }
+      return '' + verNum
     },
     getChannels() {
       const channels = []
@@ -344,7 +367,7 @@ export default {
           const channels = this.getChannels()
           let surplus = channels.length
           console.dir(channels)
-          const version = this.postForm.version
+          const version = this.getVersion()
           for (let i = 0; i < channels.length; ++i) {
             const channel = channels[i]
             const url = `http://120.132.50.206:8585/function.php?version=${version}&channel=${channel}`
@@ -413,7 +436,7 @@ export default {
           const postData1 = {
             username: 'admin',
             token: cookie.get('server_token_key'),
-            version: this.postForm.version,
+            version: this.getVersion(),
             channel: this.postForm.channels,
             type: '',
             value: ''
