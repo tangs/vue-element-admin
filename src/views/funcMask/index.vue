@@ -54,6 +54,25 @@
             <el-checkbox label="VIP "/>
             <el-checkbox label="商店"/>
             <el-checkbox label="活动"/>
+            <el-checkbox label="排行"/>
+            <el-checkbox label="更多"/>
+            <el-checkbox label="邮件"/>
+            <el-checkbox label="绑定手机"/>
+            <el-checkbox label="黄金矿工"/>
+            <el-checkbox label="聊天"/>
+            <el-checkbox label="快速开始"/>
+            <el-checkbox label="下载"/>
+            <el-checkbox label="评论"/>
+            <el-checkbox label="快速支付"/>
+            <el-checkbox label="捕鱼"/>
+            <el-checkbox label="拉霸"/>
+            <el-checkbox label="钻石购买"/>
+            <el-checkbox label="特殊捕鱼版本-更多"/>
+            <el-checkbox label="特殊捕鱼版本-普通大厅"/>
+            <el-checkbox label="特殊捕鱼版本-弹出礼包"/>
+            <el-checkbox label="扎金花中-贵宾厅"/>
+            <el-checkbox label="星座场"/>
+            <el-checkbox label="气球场"/>
           </el-checkbox-group>
         </el-row>
         <el-form-item :label="$t('funcMask.log')" prop="log">
@@ -91,6 +110,41 @@ const payMap = {
   commwappayweixin: 'H5微信',
   wechatpp: '微信APP',
   appstore: '苹果支付'
+}
+
+const hallMap = {
+  '<1': '大风车',
+  '<2': '经典水果机',
+  '<3': '金鲨银鲨',
+  '<4': '奔驰宝马',
+  '<6': '扎金花',
+  '<7': '百人牛牛',
+  '<8': '客服 ',
+  '<9': '奖励',
+  '<10': '抽奖',
+  '<11': '摇钱树',
+  '<12': 'VIP',
+  '<14': '商店',
+  '<15': '活动',
+  '<16': '排行',
+  '<17': '更多',
+  '<18': '邮件',
+  '<19': '绑定手机',
+  '<24': '黄金矿工',
+  '<26': '聊天',
+  '<27': '快速开始',
+  '<28': '下载',
+  '<29': '评论',
+  '<30': '快速支付',
+  '<32': '捕鱼',
+  '<33': '拉霸',
+  '<34': '钻石购买',
+  '<36': '特殊捕鱼版本-更多',
+  '<37': '特殊捕鱼版本-普通大厅',
+  '<38': '特殊捕鱼版本-弹出礼包',
+  '<39': '扎金花-贵宾厅',
+  '<40': '星座场',
+  '<41': '气球场'
 }
 
 export default {
@@ -157,26 +211,47 @@ export default {
     appendLog(txt) {
       this.postForm.log += txt + '\n'
     },
-    getPayName(type) {
-      return payMap[type]
-    },
-    getPayType(name) {
-      const keys = Object.keys(payMap)
+    getKeyByValue(map, value) {
+      const keys = Object.keys(map)
       for (let i = 0; i < keys.length; ++i) {
         const key = keys[i]
-        if (payMap[key] === name) {
+        if (map[key] === value) {
           return key
         }
       }
     },
-    updatePayInfo(payInfos) {
-      const masks = payInfos.split(':')
-      const payMask = []
+    getPayName(type) {
+      return payMap[type]
+    },
+    getPayType(name) {
+      return this.getKeyByValue(payMap, name)
+    },
+    getHallName(type) {
+      return hallMap[type]
+    },
+    getHallType(name) {
+      return this.getKeyByValue(hallMap, name)
+    },
+    getMasks(infos, func) {
+      const masks = infos.split(':')
+      const maskArr = []
       for (let i = 0; i < masks.length; ++i) {
-        const name = this.getPayName(masks[i])
-        payMask.push(name)
+        const name = func(masks[i])
+        maskArr.push(name)
       }
-      this.postForm.pay = payMask
+      return maskArr
+    },
+    updatePayInfo(payInfos) {
+      this.postForm.pay = this.getMasks(payInfos, this.getPayName)
+    },
+    updteHallInfo(hallInfos) {
+      this.postForm.hall = this.getMasks(hallInfos, this.getHallName)
+    },
+    clearPayInfo() {
+      this.postForm.pay = []
+    },
+    clearHallInfo() {
+      this.postForm.hall = []
     },
     notifySucc(txt) {
       this.$notify({
@@ -212,10 +287,14 @@ export default {
             if (data.result === 'true') {
               this.appendLog(paramStr)
               const params = JSON.parse(paramStr)
+              this.clearPayInfo()
+              this.clearHallInfo()
               for (let i = 0; i < params.length; ++i) {
                 const param = params[i]
                 if (param.type === 'pay') {
                   this.updatePayInfo(param.value)
+                } else if (param.type === 'hall') {
+                  this.updteHallInfo(param.value)
                 }
               }
               this.postForm.status = 'published'
@@ -246,12 +325,14 @@ export default {
             type: 'pay',
             value: ''
           }
-          const paySelects = this.postForm.pay
-          for (let i = 0; i < paySelects.length; ++i) {
-            if (i > 0) {
-              postData1.value += ':'
+          if (this.postForm.paySelected) {
+            const paySelects = this.postForm.pay
+            for (let i = 0; i < paySelects.length; ++i) {
+              if (i > 0) {
+                postData1.value += ':'
+              }
+              postData1.value += this.getPayType(paySelects[i])
             }
-            postData1.value += this.getPayType(paySelects[i])
           }
           // console.dir(postData)
           const postData = `username=${postData1.username}&token=${postData1.token}&version=${postData1.version}&channel=${postData1.channel}&type=${postData1.type}&value=${postData1.value}`
@@ -267,13 +348,6 @@ export default {
             console.log(data)
             if (data.result === 'true') {
               this.appendLog(paramStr)
-              // const params = JSON.parse(paramStr)
-              // for (let i = 0; i < params.length; ++i) {
-              //   const param = params[i]
-              //   if (param.type === 'pay') {
-              //     this.updatePayInfo(param.value)
-              //   }
-              // }
               this.postForm.status = 'published'
             } else {
               this.notifyErr(paramStr)
