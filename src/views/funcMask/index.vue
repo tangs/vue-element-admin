@@ -490,11 +490,23 @@ export default {
           }).then(() => {
             const channels = this.getChannels()
             let surplus = 0
+            let succNum = 0
             console.dir(channels)
             const callback = (ret, error) => {
               if (--surplus === 0) {
                 this.loading = false
-                this.notifySucc('发布完成')
+                // this.notifySucc('发布完成')
+              }
+              if (ret === true) {
+                if (++succNum === channels.length) {
+                  axios.post('http://inner.fc9158.com/reloadfunctionctl').then(() => {
+                    this.notifySucc('发布完成')
+                    this.appendLog('发布完成')
+                  }).catch((error) => {
+                    this.notifySucc('发布失败')
+                    this.appendLog('发布失败(reload)' + error)
+                  })
+                }
               }
             }
             for (let i = 0; i < channels.length; ++i) {
